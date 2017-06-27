@@ -7,8 +7,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.xml.sax.*;
-import org.xml.sax.ContentHandler;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
@@ -20,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import javax.xml.parsers.SAXParserFactory;
 
@@ -242,4 +249,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .post(requestBody)
                 .build();
     }
+
+    private void parseJSONWithJSONObject(String jsonData){
+        try {
+            JSONArray jsonArray = new JSONArray(jsonData);
+            for (int i = 0; i < jsonArray.length(); i++){
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String id = jsonObject.getString("id");
+                String name = jsonObject.getString("name");
+                String version = jsonObject.getString("version");
+                Log.d(TAG, "parseJSONWithJSONObject: id is " + id);
+                Log.d(TAG, "parseJSONWithJSONObject: name is " + name);
+                Log.d(TAG, "parseJSONWithJSONObject: version is" + version);
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    class App{
+        private String id;
+        private String name;
+        private String version;
+
+        public String getId(){
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName(){
+            return name;
+        }
+        public void setName(String name){
+            this.name = name;
+        }
+
+
+        public String getVersion(){
+            return version;
+        }
+
+        public void setVersion(String version) {
+            this.version = version;
+        }
+    }
+
+    private void parseJSONWithGSON(String jsonData){
+        Gson gson = new Gson();
+        List <App> appList = gson.fromJson(jsonData, new TypeToken<App>(){}.getType());
+
+        for (App app : appList){
+            Log.d(TAG, "parseJSONWithGSON: id is " + app.getId());
+            Log.d(TAG, "parseJSONWithGSON: name is " + app.getName());
+            Log.d(TAG, "parseJSONWithGSON: version is " + app.getVersion());
+        }
+    }
+
 }
